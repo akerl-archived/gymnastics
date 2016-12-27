@@ -21,3 +21,7 @@ Compares the lists from avail.rb and recorded.rb, logging matches in `found.txt`
 
 Pulls stats for the gymnasts in `found.txt` from http://www.roadtonationals.com and records them in the `./stats` directory.
 
+### math.rb
+
+Open a REPL with the gymnasts loaded in for data manipulation.
+
