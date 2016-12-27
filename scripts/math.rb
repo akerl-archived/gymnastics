@@ -13,10 +13,10 @@ class Scores
   attr_reader :vault, :bars, :beam, :floor
   def initialize(scores)
     scores ||= {}
-    @vault = scores["vault"]
-    @bars = scores["bars"]
-    @beam = scores["beam"]
-    @floor = scores["floor"]
+    @vault = scores['vault']
+    @bars = scores['bars']
+    @beam = scores['beam']
+    @floor = scores['floor']
   end
 end
 
@@ -28,15 +28,14 @@ class Gymnast
     data = JSON.parse(File.read(file))
     @name = data['name']
     @team = data['team']
-    @scores = Scores.new(data['scores'])
+    @scores = Scores.new(data['score'])
   end
 end
 
 gymnasts = Dir.glob(STATS_DIR + '/*/*').map { |file| Gymnast.new file }
-g = gymnasts
-
 teams = gymnasts.group_by(&:team)
-t = teams
 
 # rubocop:disable Lint/Debugger
+g = gymnasts
+t = teams
 binding.pry
