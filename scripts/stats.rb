@@ -44,7 +44,7 @@ people_ids.each do |team, name, id|
   data = { name: name, team: team }
 
   flag = page.at_css('.highcharts-subtitle').text
-  data.merge!(parse_score(page)) unless flag =~ /NO RECORDS/
+  data[:score] = parse_score(page) unless flag =~ /NO RECORDS/
 
   FileUtils.mkdir_p dir
   File.open(file, 'w') { |fh| fh << data.to_json }
