@@ -13,10 +13,10 @@ class Scores
   attr_reader :vault, :bars, :beam, :floor
   def initialize(scores)
     scores ||= {}
-    @vault = scores[:vault]
-    @bars = scores[:bars]
-    @beam = scores[:beam]
-    @floor = scores[:floor]
+    @vault = scores["vault"]
+    @bars = scores["bars"]
+    @beam = scores["beam"]
+    @floor = scores["floor"]
   end
 end
 
