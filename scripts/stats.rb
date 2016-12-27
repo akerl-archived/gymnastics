@@ -9,8 +9,8 @@ require 'json'
 Dir.chdir File.expand_path(File.dirname(__FILE__))
 
 BROWSER = Watir::Browser.new
-BASE_URL = 'http://www.roadtonationals.com/results/charts/ch_consistency_i.php'
-BASE_PERSON_URL = "#{BASE_URL}?yr=2016&z=0&gid="
+BASE_URL = 'http://www.roadtonationals.com/results/charts/ch_consistency_i.php'.freeze
+BASE_PERSON_URL = "#{BASE_URL}?yr=2016&z=0&gid=".freeze
 
 SCORE_START = /\A.*series: \[/m
 SCORE_STOP = /\s+\]\s+}\);\s+}\);\s+}\);\s+\z/m
@@ -25,10 +25,16 @@ people_ids = File.readlines('../data/found.txt').map do |x|
   x.chomp.split('---')
 end
 
+def extract_script(page)
+  score_script = page.css('script').find do |y|
+    y.text =~ /Individual Event Score/
+  end
+  score_raw = score_script.children.first.text
+  score_raw.sub(SCORE_START, '').sub(SCORE_STOP, '')
+end
+
 def parse_score(page)
-  score_script = page.css('script').find { |y| y.text =~ /Individual Event Score/ }
-  score_raw = score_script.children.first.text.sub(SCORE_START, '').sub(SCORE_STOP, '')
-  score_data = ExecJS.eval('[' + score_raw + ']').map do |y|
+  ExecJS.eval('[' + extract_script(page) + ']').map do |y|
     [y['name'].downcase.to_sym, y['data']]
   end.to_h
 end

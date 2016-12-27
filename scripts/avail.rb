@@ -6,8 +6,12 @@ Dir.chdir File.expand_path(File.dirname(__FILE__))
 
 page = Nokogiri::HTML(open('../data/draft_list.html'))
 
-teams = page.at_css('ul.dropdown-menu').css('a')[1..-1].map { |x| [x['data-school'], x.text] }.to_h
-people = page.at_css('#hiddenSelectFrom').css('li').map { |x| { name: x.text, team: teams[x['data-school']] } }
+teams = page.at_css('ul.dropdown-menu').css('a')[1..-1].map do |x|
+  [x['data-school'], x.text]
+end.to_h
+people = page.at_css('#hiddenSelectFrom').css('li').map do |x|
+  { name: x.text, team: teams[x['data-school']] }
+end
 
 def text_clean(text)
   text.downcase.gsub(/\s/, '').gsub(/\(.*\)/, '').gsub(/\W/, '')

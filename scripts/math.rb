@@ -5,8 +5,10 @@ require 'json'
 
 Dir.chdir File.expand_path(File.dirname(__FILE__))
 
-STATS_DIR = '../stats'
+STATS_DIR = '../stats'.freeze
 
+##
+# Helper class for accessing scores
 class Scores
   attr_reader :vault, :bars, :beam, :floor
   def initialize(scores)
@@ -18,6 +20,8 @@ class Scores
   end
 end
 
+##
+# Helper class for accessing gymnasts
 class Gymnast
   attr_reader :name, :team
   def initialize(file)
@@ -34,5 +38,5 @@ g = gymnasts
 teams = gymnasts.group_by(&:team)
 t = teams
 
+# rubocop:disable Lint/Debugger
 binding.pry
-
