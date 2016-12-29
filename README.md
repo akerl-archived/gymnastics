@@ -25,27 +25,3 @@ Pulls stats for the gymnasts in `found.txt` from http://www.roadtonationals.com 
 
 Open a REPL with the gymnasts loaded in for data manipulation.
 
-## Strategy
-
-Here's the query I'm using for the 1st pass of my draft:
-
-```
-mine = (
-    # Folks who compete well in all 4 events
-    g.select { |x| x.competes(0.8, 9.5).size > 3 } + \
-    # Folks who compete great in 2+ events
-    g.select { |x| x.competes(0.8, 9.8).size > 1 } + \
-    # Folks who compete excellently in any event
-    g.select { |x| x.competes(0.7, 9.9).size > 0 } + \
-    # Folks who get 10s
-    g.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| z == 10 }.size > 0 }.size > 0 } + \
-    # Folks who always compete in 3 or more events
-    g.select { |x| x.competes(1.0, 9.6).size > 2 } + \
-    # Star freshmen
-    %w(mykaylaskinner maggienichols ameliahundley).map { |x| find x } + \
-    # Promising freshmen
-    %w(kennediedney maddiekarr kimtessen taylorhouchin cassidykellen racheldickson graceglenn wynterchilders missyreinstadtler samogden).map { |x| find x } \
-).uniq
-# Reject injured athlete
-mine.reject! { |x| x.name == 'kaseyjanowicz' }
-```
