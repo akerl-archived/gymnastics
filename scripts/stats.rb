@@ -69,6 +69,6 @@ end
 
 wildcards.each do |team, name|
   puts "Creating file for wildcard #{name} / #{team}"
-  data = { name: name, team: team }
+  data = { name: name, team: team, wildcard: true }
   File.open(get_stat_path(team, name), 'w') { |fh| fh << data.to_json }
 end
