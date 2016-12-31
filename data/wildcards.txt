@@ -4,6 +4,7 @@ airforce---ritakoenigbauer
 airforce---victorianojaim
 alabama---caitlincloe
 alabama---maddidesch
+alabama---sheamahoney
 alabama---wynterchilders
 alaska---kennedygreen
 alaska---louisaknapp
@@ -119,6 +120,7 @@ gustavusadolphus---laurencasey
 gustavusadolphus---leahdargis
 gustavusadolphus---leahhellig
 illinoischampaign---brittanyjones
+illinoischampaign---karenhowell
 illinoischampaign---lindsaydwyer
 illinoischampaign---raebalthazor
 illinoisstate---alyssawiggle
@@ -271,6 +273,14 @@ sanjosestate---karlihoughton
 sanjosestate---leahperrino
 sanjosestate---madisonloomis
 sanjosestate---taylorchan
+seattlepacific---carolinejung
+seattlepacific---darianburns
+seattlepacific---itziasanroman
+seattlepacific---izzytsark
+seattlepacific---lenawirth
+seattlepacific---miyukimatsune
+seattlepacific---siennabrane
+seattlepacific---zahralawal
 semissouri---charleemiller
 semissouri---courtneytaylor
 semissouri---kendallrumford
