@@ -50,9 +50,9 @@ class Gymnast
 
   def averages
     @averages ||= EVENTS.map do |event|
-      data = @scores.send(event)
+      data = @scores.send(event).compact
       next [event, 0] if data.empty?
-      [event, data.compact.reduce(:+) / data.size]
+      [event, data.reduce(:+) / data.size]
     end.to_h
   end
 
