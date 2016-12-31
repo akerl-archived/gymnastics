@@ -111,7 +111,7 @@ mine += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| 
 mine += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| (z || 0) > 9.9 }.size > 1 }.size > 0 }.sort
 
 rand = Random.new(3)
-count = 18
+count = 17
 mine += GYMNASTS.sample(count, random: rand)
 
 rejections = (
