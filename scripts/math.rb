@@ -80,7 +80,7 @@ end
 GYMNASTS = Dir.glob(STATS_DIR + '/*/*').map { |file| Gymnast.new file }
 TEAMS = GYMNASTS.group_by(&:team)
 
-mine = (
+draft = (
   # Folks who get 10s
   GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| z == 10 }.size > 0 }.size > 0 }.sort + \
   # Star freshmen
@@ -98,32 +98,35 @@ mine = (
 )
 
 # Collect frequent leaders from teams not already represented
-freq_unrep = TEAMS.reject { |k, v| mine.group_by(&:team).keys.include? k }.map { |k, v| [k, v.select { |x| x.competes(0.9, 9.5).size > 1 }] }.reject { |k, v| v.empty? }.to_h.values.flatten
+freq_unrep = TEAMS.reject { |k, v| draft.group_by(&:team).keys.include? k }.map { |k, v| [k, v.select { |x| x.competes(0.9, 9.5).size > 1 }] }.reject { |k, v| v.empty? }.to_h.values.flatten
 # Collect frequent leaders from teams with weak representation
-freq_lowrep = TEAMS.reject { |k, v| (mine.group_by(&:team)[k] || [1] * 4).size > 2 }.map { |k, v| [k, v.select { |x| x.competes(0.9, 9.5).size > 2 }] }.reject { |k, v| v.empty? }.to_h.values.flatten
+freq_lowrep = TEAMS.reject { |k, v| (draft.group_by(&:team)[k] || [1] * 4).size > 2 }.map { |k, v| [k, v.select { |x| x.competes(0.9, 9.5).size > 2 }] }.reject { |k, v| v.empty? }.to_h.values.flatten
 # Add above two collections to draft pool
-mine += freq_unrep.sort + freq_lowrep.sort
+draft += freq_unrep.sort + freq_lowrep.sort
 
 # Add gymnasts who got equal to or better than 9.9 at least twice on at least 2 events
-mine += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| (z || 0) >= 9.9 }.size > 1 }.size > 1 }.sort
+draft += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| (z || 0) >= 9.9 }.size > 1 }.size > 1 }.sort
 
 # Add gymnasts who got better than 9.9 at least twice on at least 1 events
-mine += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| (z || 0) > 9.9 }.size > 1 }.size > 0 }.sort
+draft += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.send(y).select { |z| (z || 0) > 9.9 }.size > 1 }.size > 0 }.sort
 
 rand = Random.new(3)
 count = 17
-mine += GYMNASTS.sample(count, random: rand)
+draft += GYMNASTS.sample(count, random: rand)
 
 rejections = (
     # Injured athletes
     %w(sarahgarcia leahmacmoyle sydneyconverse micoleodell makenziekerouac meganfinck charlysantagado anniejuarez madisonpreston emilyliddle heatherelswick kylaross sheamahoney sofieriley gabbyhechtman kaseyjanowicz dianachesnok rachelfielitz hollyryan ashleylambert kaitlynnhedelund breshowers mckennasignley chanenraygoza emilybolton megankyle jackiesampson courtneysoliwoda kennaskepnek nikkimcnair alexisbrown mikaelagerber nicoletteswoboda)
 )
-mine.reject! { |x| rejections.include? x.name }
+draft.reject! { |x| rejections.include? x.name }
 
-mine.uniq!
+draft.uniq!
 
 g = GYMNASTS
 t = TEAMS
+d = draft
+
+mine = File.readlines('../data/team').map { |x| find(x.downcase.gsub(/[^\w]/, '')) }
 m = mine
 
 p m.size
