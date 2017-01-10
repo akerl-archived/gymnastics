@@ -97,8 +97,6 @@ draft = (
   GYMNASTS.select { |x| x.competes(1.0, 9.6).size > 2 }.sort
 )
 
-binding.pry
-
 # Collect frequent leaders from teams not already represented
 freq_unrep = TEAMS.reject { |k, v| draft.group_by(&:team).keys.include? k }.map { |k, v| [k, v.select { |x| x.competes(0.9, 9.5).size > 1 }] }.reject { |k, v| v.empty? }.to_h.values.flatten
 # Collect frequent leaders from teams with weak representation
