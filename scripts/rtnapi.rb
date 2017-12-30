@@ -15,6 +15,10 @@ class RTNApi
     @cur_year ||= Date.today.year
   end
 
+  def start_year
+    @start_year ||= cur_year - 5
+  end
+
   def self.clean_text(text)
     text.downcase.gsub(/\s/, '').gsub(/\(.*\)/, '').gsub(/\W/, '')
   end
@@ -63,26 +67,32 @@ class RTNApi
     return @gymnasts if @gymnasts
     @gymnasts = teams.flat_map do |tname, tdata|
       tdata['gymnasts'].map do |data|
-        mdata = parse(gymnast_uri(data['id']))['meets']
-        mdata.each do |x|
-          x['team'] = tname
-          x['id'] = data['id']
-          x['name'] = RTNApi.clean_text(x['fname'] + x['lname'])
-          ['all_around', 'vault', 'bars', 'beam', 'floor'].each { |y| x[y] = x[y].to_i }
-          x['meet_date'] = Time.at(x['meet_date'].to_i)
-        end
         name = RTNApi.clean_text(mdata.first.values_at('fname', 'lname').join)
-        [
+        res = [
           name,
           {
             team: tname,
             id: data['id'],
             name: name,
-            meets: mdata
+            meets: {}
           }
         ]
-      end
-    end.to_h
-    @gymnasts = Cymbal.symbolize @gymnasts
+        start_year.upto(cur_year) do |year|
+          parse_gymnast_year(res, year)
+        end
+        res
+      end.to_h
+    end
+  end
+
+  def parse_gymnast_year(h, year)
+    mdata = parse(gymnast_uri(data['id'], year))['meets']
+    return if mdata.empty?
+    res = {}
+    events = ['all_around', 'vault', 'bars', 'beam', 'floor']
+    mdata.each do |x|
+      res[Time.at(x['meet_date'].to_i)] = events.map { |y| [y, x[y].to_i] }.to_h
+    end
+    h[meets][year] = res
   end
 end
