@@ -3,19 +3,6 @@
 Dir.chdir File.expand_path(File.dirname(__FILE__))
 
 special = [
-  %w(arizonastate nichellechristopherson 23892),
-  %w(bowlinggreen indiamcpeak 22843),
-  %w(florida rachelslocum 22703),
-  %w(georgewashington brookebray 22515),
-  %w(michigan paigezaziski 22513),
-  %w(michiganstate tessajaranowski 23096),
-  %w(nebraska abbieepperson 22821),
-  %w(newhampshire brittanycapozzi 24333),
-  %w(ohiostate amandahuang 23911),
-  %w(temple morganfridey 24133),
-  %w(texaswomans morgancolee 23968),
-  %w(utah maceyroberts 24191),
-  %w(winonastate devangreen 24425)
 ]
 
 avail = File.open('../data/avail.txt').map { |x| x.chomp.split('---') }

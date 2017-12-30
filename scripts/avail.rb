@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'nokogiri'
+require 'rtnapi'
 
 Dir.chdir File.expand_path(File.dirname(__FILE__))
 
@@ -13,12 +14,8 @@ people = page.at_css('#hiddenSelectFrom').css('li').map do |x|
   { name: x.text, team: teams[x['data-school']] }
 end
 
-def text_clean(text)
-  text.downcase.gsub(/\s/, '').gsub(/\(.*\)/, '').gsub(/\W/, '')
-end
-
 clean_names = people.map do |info|
-  info.values_at(:team, :name).map { |x| text_clean(x) }.join('---')
+  info.values_at(:team, :name).map { |x| RTNApi.clean_text(x) }.join('---')
 end
 
 File.open('../data/avail.txt', 'w') do |fh|
