@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
 require_relative 'rtnapi.rb'
+require 'pry'
 
 api = RTNApi.new
 teams = api.teams
-gymnsts = api.gymnasts
+gymnasts = api.gymnasts
 
 binding.pry

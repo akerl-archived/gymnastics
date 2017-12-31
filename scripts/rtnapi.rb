@@ -13,7 +13,7 @@ class RTNApi
   end
 
   def cur_year
-    @cur_year ||= Date.today.year
+    2018
   end
 
   def start_year
@@ -46,7 +46,7 @@ class RTNApi
   end
 
   def write_cache(uri, res)
-    cache_file = File.join('cache', uri)
+    cache_file = File.join('stats', uri)
     FileUtils.mkdir_p File.dirname(cache_file)
     File.open(cache_file, 'w') { |fh| fh << JSON.dump(res) }
   end
@@ -98,6 +98,7 @@ class RTNApi
   def parse_gymnast_year(res, year)
     mdata = parse(gymnast_uri(res[:id], year))['meets']
     return if mdata.empty?
+    puts "Reading events for #{res[:name]} on #{res[:team]} for #{year}"
     ydata = {}
     events = ['all_around', 'vault', 'bars', 'beam', 'floor']
     mdata.each do |x|
