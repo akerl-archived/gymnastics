@@ -68,33 +68,30 @@ class RTNApi
     @gymnasts = teams.flat_map do |tname, tdata|
       tdata[:gymnasts].map do |data|
         name = RTNApi.clean_text(data.values_at(:fname, :lname).join)
-        res = [
-          name,
-          {
-            team: tname,
-            id: data[:id],
-            name: name,
-            meets: {}
-          }
-        ]
+        res = {
+          team: tname,
+          id: data[:id],
+          name: name,
+          meets: {}
+        }
         start_year.upto(cur_year) do |year|
           parse_gymnast_year(res, year)
         end
-        res
+        [name, res]
       end.to_h
     end
     @gymnasts = Cymbal.symbolize @gymnasts
   end
 
-  def parse_gymnast_year(h, year)
-    puts "Checking #{h[:name]} for #{year}"
-    mdata = parse(gymnast_uri(data['id'], year))['meets']
+  def parse_gymnast_year(res, year)
+    puts "Checking #{res[:name]} for #{year}"
+    mdata = parse(gymnast_uri(res[:id], year))['meets']
     return if mdata.empty?
-    res = {}
+    ydata = {}
     events = ['all_around', 'vault', 'bars', 'beam', 'floor']
     mdata.each do |x|
-      res[Time.at(x['meet_date'].to_i)] = events.map { |y| [y, x[y].to_i] }.to_h
+      ydata[Time.at(x['meet_date'].to_i)] = events.map { |y| [y, x[y].to_i] }.to_h
     end
-    h[meets][year] = res
+    res[:meets][year] = res
   end
 end
