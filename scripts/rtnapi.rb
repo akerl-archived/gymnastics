@@ -2,6 +2,7 @@
 
 require 'json'
 require 'open-uri'
+require 'fileutils'
 require 'date'
 require 'cymbal'
 
@@ -23,27 +24,39 @@ class RTNApi
     text.downcase.gsub(/\s/, '').gsub(/\(.*\)/, '').gsub(/\W/, '')
   end
 
-  def uri(path)
-    BASE_URI + path 
-  end
-
   def schema_uri(year = nil)
     year ||= cur_year
-    uri "schema/#{year}"
+    "schema/#{year}"
   end
 
   def team_uri(team_id, year = nil)
     year ||= cur_year
-    uri "gymnasts/#{year}/#{team_id}"
+    "gymnasts/#{year}/#{team_id}"
   end
 
   def gymnast_uri(gymnast_id, year = nil)
     year ||= cur_year
-    uri "gymnast/#{year}/#{gymnast_id}"
+    "gymnast/#{year}/#{gymnast_id}"
+  end
+
+  def check_cache(uri)
+    cache_file = File.join('cache', uri)
+    return nil unless File.exist? cache_file
+    cache_file
+  end
+
+  def write_cache(uri, res)
+    cache_file = File.join('cache', uri)
+    FileUtils.mkdir_p File.dirname(cache_file)
+    File.open(cache_file, 'w') { |fh| fh << JSON.dump(res) }
   end
 
   def parse(uri)
-    JSON.load(open(uri).read)
+    cache_file = check_cache uri
+    source = cache_file || BASE_URI + uri
+    res = JSON.load(open(source).read)
+    write_cache(uri, res) unless cache_file
+    res
   end
 
   def schema
@@ -55,6 +68,7 @@ class RTNApi
     @teams = schema['teams'].map do |k, v|
       name = RTNApi.clean_text(v)
       id = k[1..-1]
+      puts "Loading team #{name}"
       data = parse(team_uri(id))
       data['name'] = name
       data['id'] = id
@@ -84,7 +98,7 @@ class RTNApi
   end
 
   def parse_gymnast_year(res, year)
-    puts "Checking #{res[:name]} for #{year}"
+    puts "Checking #{res[:name]} from #{res[:team]} for #{year}"
     mdata = parse(gymnast_uri(res[:id], year))['meets']
     return if mdata.empty?
     ydata = {}
