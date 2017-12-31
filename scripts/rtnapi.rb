@@ -40,7 +40,7 @@ class RTNApi
   end
 
   def check_cache(uri)
-    cache_file = File.join('cache', uri)
+    cache_file = File.join('stats', uri)
     return nil unless File.exist? cache_file
     cache_file
   end
@@ -68,7 +68,6 @@ class RTNApi
     @teams = schema['teams'].map do |k, v|
       name = RTNApi.clean_text(v)
       id = k[1..-1]
-      puts "Loading team #{name}"
       data = parse(team_uri(id))
       data['name'] = name
       data['id'] = id
@@ -94,18 +93,16 @@ class RTNApi
         [name, res]
       end.to_h
     end
-    @gymnasts = Cymbal.symbolize @gymnasts
   end
 
   def parse_gymnast_year(res, year)
-    puts "Checking #{res[:name]} from #{res[:team]} for #{year}"
     mdata = parse(gymnast_uri(res[:id], year))['meets']
     return if mdata.empty?
     ydata = {}
     events = ['all_around', 'vault', 'bars', 'beam', 'floor']
     mdata.each do |x|
-      ydata[Time.at(x['meet_date'].to_i)] = events.map { |y| [y, x[y].to_i] }.to_h
+      ydata[Time.at(x['meet_date'].to_i)] = events.map { |y| [y.to_sym, x[y].to_i] }.to_h
     end
-    res[:meets][year] = res
+    res[:meets][year.to_s] = res
   end
 end
