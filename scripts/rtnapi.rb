@@ -66,13 +66,13 @@ class RTNApi
   def gymnasts
     return @gymnasts if @gymnasts
     @gymnasts = teams.flat_map do |tname, tdata|
-      tdata['gymnasts'].map do |data|
-        name = RTNApi.clean_text(mdata.first.values_at('fname', 'lname').join)
+      tdata[:gymnasts].map do |data|
+        name = RTNApi.clean_text(data.values_at(:fname, :lname).join)
         res = [
           name,
           {
             team: tname,
-            id: data['id'],
+            id: data[:id],
             name: name,
             meets: {}
           }
@@ -83,9 +83,11 @@ class RTNApi
         res
       end.to_h
     end
+    @gymnasts = Cymbal.symbolize @gymnasts
   end
 
   def parse_gymnast_year(h, year)
+    puts "Checking #{h[:name]} for #{year}"
     mdata = parse(gymnast_uri(data['id'], year))['meets']
     return if mdata.empty?
     res = {}
