@@ -54,6 +54,7 @@ class RTNApi
   def parse(uri)
     cache_file = check_cache uri
     source = cache_file || BASE_URI + uri
+    puts "Downloading #{source}" unless cache_file
     res = JSON.load(open(source).read)
     write_cache(uri, res) unless cache_file
     res
@@ -82,7 +83,7 @@ class RTNApi
       tdata[:gymnasts].map do |data|
         name = RTNApi.clean_text(data.values_at(:fname, :lname).join)
         res = {
-          team: tname,
+          team: tname.to_s,
           id: data[:id],
           name: name,
           meets: {}
@@ -90,20 +91,18 @@ class RTNApi
         start_year.upto(cur_year) do |year|
           parse_gymnast_year(res, year)
         end
-        [name, res]
-      end.to_h
+        res
+      end
     end
   end
 
   def parse_gymnast_year(res, year)
     mdata = parse(gymnast_uri(res[:id], year))['meets']
     return if mdata.empty?
-    puts "Reading events for #{res[:name]} on #{res[:team]} for #{year}"
     ydata = {}
     events = ['all_around', 'vault', 'bars', 'beam', 'floor']
     mdata.each do |x|
-      ydata[Time.at(x['meet_date'].to_i)] = events.map { |y| [y.to_sym, x[y].to_i] }.to_h
+      res[:meets][Time.at(x['meet_date'].to_i)] = events.map { |y| [y.to_sym, x[y].to_f] }.to_h
     end
-    res[:meets][year.to_s] = res
   end
 end

@@ -1,25 +1,32 @@
 #!/usr/bin/env ruby
 
 require 'nokogiri'
-require 'rtnapi'
+require_relative 'rtnapi.rb'
 
-Dir.chdir File.expand_path(File.dirname(__FILE__))
+class Avail
+  def initialize
+  end
 
-page = Nokogiri::HTML(open('../data/draft_list.html'))
+  def source
+    @source ||= 'data/draft_list.html'
+  end
 
-teams = page.at_css('ul.dropdown-menu').css('a')[1..-1].map do |x|
-  [x['data-school'], x.text]
-end.to_h
-people = page.at_css('#hiddenSelectFrom').css('li').map do |x|
-  { name: x.text, team: teams[x['data-school']] }
-end
+  def page
+    @page ||= Nokogiri::HTML(open(source))
+  end
 
-clean_names = people.map do |info|
-  info.values_at(:team, :name).map { |x| RTNApi.clean_text(x) }.join('---')
-end
+  def teams
+    @teams ||= page.at_css('ul.dropdown-menu').css('a')[1..-1].map do |x|
+      [x['data-school'], x.text]
+    end.to_h
+  end
 
-File.open('../data/avail.txt', 'w') do |fh|
-  clean_names.sort.each do |name|
-    fh << name + "\n"
+  def people
+    @people ||= page.at_css('#hiddenSelectFrom').css('li').map do |x|
+      {
+        name: RTNApi.clean_text(x.text),
+        team: RTNApi.clean_text(teams[x['data-school']])
+      }
+    end
   end
 end
