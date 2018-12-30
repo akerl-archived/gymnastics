@@ -80,12 +80,14 @@ class RTNApi
 
   def gymnasts
     return @gymnasts if @gymnasts
-    @gymnasts = Parallel.map(teams, in_threads: 10) do |a|
+    #@gymnasts = Parallel.map(teams, in_threads: 10) do |a|
+    @gymnasts = teams.map do |a|
       tname, tdata = a
       tdata[:gymnasts].map do |data|
         name = RTNApi.clean_text(data.values_at(:fname, :lname).join)
         res = {
           team: tname.to_s,
+          teamid: tdata[:id],
           id: data[:id],
           name: name,
           meets: {}
@@ -99,12 +101,30 @@ class RTNApi
   end
 
   def parse_gymnast_year(res, year)
-    mdata = parse(gymnast_uri(res[:id], year))['meets']
+    meets = parse_gymnast_data(res[:id], year)
+    meets ||= parse_gymnast_old_id(res, year)
+    meets ||= {}
+    res[:meets].merge!(meets)
+  end
+
+  def parse_gymnast_data(id, year)
+    mdata = parse(gymnast_uri(id, year))['meets']
     return if mdata.empty?
-    ydata = {}
     events = ['all_around', 'vault', 'bars', 'beam', 'floor']
+    meets = {}
     mdata.each do |x|
-      res[:meets][Time.at(x['meet_date'].to_i)] = events.map { |y| [y.to_sym, x[y].to_f] }.to_h
+      meets[Time.at(x['meet_date'].to_i)] = events.map { |y| [y.to_sym, x[y].to_f] }.to_h
     end
+    meets
+  end
+
+  def parse_gymnast_old_id(res, year)
+    old_team = parse(team_uri(res[:teamid], year))
+    old_names = old_team["gymnasts"].map do |x|
+      [RTNApi.clean_text(x.values_at('fname', 'lname').join), x['id']]
+    end.to_h
+    old_id = old_names[res[:name]]
+    return unless old_id
+    parse_gymnast_data(old_id, year)
   end
 end
