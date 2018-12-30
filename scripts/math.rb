@@ -43,10 +43,10 @@ draft += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.map { |x| x[y] }.sel
 draft += GYMNASTS.select { |x| EVENTS.select { |y| x.scores.map { |x| x[y] }.select { |z| (z || 0) > 9.9 }.size > 1 }.size > 0 }.sort
 
 rand = Random.new(3)
-count = 23
+count = 100
 draft += GYMNASTS.sample(count, random: rand)
-
 draft.uniq!
+draft = draft.take(200)
 
 g = GYMNASTS
 t = TEAMS

@@ -5,6 +5,7 @@ require 'open-uri'
 require 'fileutils'
 require 'date'
 require 'cymbal'
+require 'parallel'
 
 class RTNApi
   BASE_URI = 'https://www.roadtonationals.com/api/women/'
@@ -13,11 +14,11 @@ class RTNApi
   end
 
   def cur_year
-    2018
+    2019
   end
 
   def start_year
-    @start_year ||= cur_year - 5
+    @start_year ||= cur_year - 3
   end
 
   def self.clean_text(text)
@@ -79,7 +80,8 @@ class RTNApi
 
   def gymnasts
     return @gymnasts if @gymnasts
-    @gymnasts = teams.flat_map do |tname, tdata|
+    @gymnasts = Parallel.map(teams, in_threads: 10) do |a|
+      tname, tdata = a
       tdata[:gymnasts].map do |data|
         name = RTNApi.clean_text(data.values_at(:fname, :lname).join)
         res = {
@@ -93,7 +95,7 @@ class RTNApi
         end
         res
       end
-    end
+    end.flatten
   end
 
   def parse_gymnast_year(res, year)
