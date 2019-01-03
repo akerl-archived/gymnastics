@@ -51,6 +51,7 @@ draft = draft.take(200)
 g = GYMNASTS
 t = TEAMS
 d = draft
+t = File.read('data/team').split("\n").map { |x| find RTNApi.clean_text(x) }
 
 # rubocop:disable Lint/Debugger
 binding.pry
