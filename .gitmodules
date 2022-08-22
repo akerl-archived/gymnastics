@@ -1,3 +1,0 @@
-[submodule "stats"]
-	path = stats
-	url = git@github.com:akerl/gym_stats
